@@ -20,7 +20,7 @@ fn main() {
                 let mydns = DNS::from(&buf[0..size]);
                 let _received_data = String::from_utf8_lossy(&buf[0..size]);
                 println!("Received {} bytes from {}", size, source);
-                let response = mydns.head().zero();
+                let response = mydns.head().get_0();
                 udp_socket
                     .send_to(&response, source)
                     .expect("Failed to send response");
