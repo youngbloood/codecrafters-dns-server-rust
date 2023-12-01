@@ -60,7 +60,7 @@ impl Header {
         return u16::from_be_bytes(id);
     }
 
-    pub fn id_with(&mut self, id: u16) -> &mut Self {
+    pub fn with_id(&mut self, id: u16) -> &mut Self {
         let ids = id.to_be_bytes();
         (self.0[0], self.0[1]) = (ids[0], ids[1]);
         return self;
@@ -73,7 +73,7 @@ impl Header {
         return self.0[2] & 0b0000_0001;
     }
 
-    pub fn qr_with(&mut self, qr: u8) -> &mut Self {
+    pub fn with_qr(&mut self, qr: u8) -> &mut Self {
         if qr > 1 {
             return self;
         }
@@ -83,31 +83,31 @@ impl Header {
     // Operation Code (OPCODE): 4 bits
     // Specifies the kind of query in a message.
     // Expected value: 0.
-    pub fn op_code(&self) -> u8 {
+    pub fn opcode(&self) -> u8 {
         return (self.0[2] & 0b0001_1110) >> 1;
     }
 
-    pub fn op_code_with(&mut self, op_code: u8) -> &mut Self {
-        if op_code << 1 > 0b0001_1110 {
+    pub fn with_opcode(&mut self, opcode: u8) -> &mut Self {
+        if opcode << 1 > 0b0001_1110 {
             return self;
         }
 
-        if op_code << 1 & 0b0000_0010 == 0b0000_0010 {
+        if opcode << 1 & 0b0000_0010 == 0b0000_0010 {
             self.set_bit(2, 1, 1);
         } else {
             self.set_bit(2, 1, 0);
         }
-        if op_code << 1 & 0b0000_0100 == 0b0000_0100 {
+        if opcode << 1 & 0b0000_0100 == 0b0000_0100 {
             self.set_bit(2, 2, 1);
         } else {
             self.set_bit(2, 2, 0);
         }
-        if op_code << 1 & 0b0000_1000 == 0b0000_1000 {
+        if opcode << 1 & 0b0000_1000 == 0b0000_1000 {
             self.set_bit(2, 3, 1);
         } else {
             self.set_bit(2, 3, 0);
         }
-        if op_code << 1 & 0b0001_0000 == 0b0001_0000 {
+        if opcode << 1 & 0b0001_0000 == 0b0001_0000 {
             self.set_bit(2, 4, 1);
         } else {
             self.set_bit(2, 4, 0);
@@ -123,7 +123,7 @@ impl Header {
         return (self.0[2] & 0b0010_0000) >> 5;
     }
 
-    pub fn aa_with(&mut self, aa: u8) -> &mut Self {
+    pub fn with_aa(&mut self, aa: u8) -> &mut Self {
         if aa > 1 {
             return self;
         }
@@ -137,7 +137,7 @@ impl Header {
         return (self.0[2] & 0b0100_0000) >> 6;
     }
 
-    pub fn tc_with(&mut self, tc: u8) -> &mut Self {
+    pub fn with_tc(&mut self, tc: u8) -> &mut Self {
         if tc > 1 {
             return self;
         }
@@ -151,7 +151,7 @@ impl Header {
         return (self.0[2] & 0b1000_0000) >> 7;
     }
 
-    pub fn rd_with(&mut self, rd: u8) -> &mut Self {
+    pub fn with_rd(&mut self, rd: u8) -> &mut Self {
         if rd > 1 {
             return self;
         }
@@ -165,7 +165,7 @@ impl Header {
         return self.0[3] & 0b0000_0001;
     }
 
-    pub fn ra_with(&mut self, ra: u8) -> &mut Self {
+    pub fn with_ra(&mut self, ra: u8) -> &mut Self {
         if ra > 1 {
             return self;
         }
@@ -179,7 +179,7 @@ impl Header {
         return (self.0[3] & 0b0000_1110) >> 1;
     }
 
-    pub fn z_with(&mut self, z: u32) -> &mut Self {
+    pub fn with_z(&mut self, z: u32) -> &mut Self {
         if z << 1 > 0b0000_1110 {
             return self;
         }
@@ -206,11 +206,11 @@ impl Header {
     // Response Code (RCODE):4 bits
     // Response code indicating the status of the response.
     // Expected value: 0 (no error).
-    pub fn r_code(&self) -> u8 {
+    pub fn rcode(&self) -> u8 {
         return (self.0[3] & 0b1111_0000) >> 4;
     }
 
-    pub fn r_code_with(&mut self, rcode: u32) -> &mut Self {
+    pub fn with_rcode(&mut self, rcode: u32) -> &mut Self {
         if rcode << 4 > 0b1111_0000 {
             return self;
         }
@@ -242,12 +242,12 @@ impl Header {
     // Question Count (QDCOUNT): 16 bits
     // Number of questions in the Question section.
     // Expected value: 0.
-    pub fn qd_count(&self) -> u16 {
-        let qd = [self.0[4], self.0[5]];
+    pub fn qdcount(&self) -> u16 {
+        let qd: [u8; 2] = [self.0[4], self.0[5]];
         return u16::from_be_bytes(qd);
     }
 
-    pub fn qd_count_with(&mut self, qdcount: u16) -> &mut Self {
+    pub fn with_qdcount(&mut self, qdcount: u16) -> &mut Self {
         let bts = qdcount.to_be_bytes();
         (self.0[4], self.0[5]) = (bts[0], bts[1]);
         return self;
@@ -256,12 +256,12 @@ impl Header {
     // Answer Record Count (ANCOUNT): 16 bits
     // Number of records in the Answer section.
     // Expected value: 0.
-    pub fn an_count(&self) -> u16 {
+    pub fn ancount(&self) -> u16 {
         let an = [self.0[6], self.0[7]];
         return u16::from_be_bytes(an);
     }
 
-    pub fn an_count_with(&mut self, ancount: u16) -> &mut Self {
+    pub fn with_ancount(&mut self, ancount: u16) -> &mut Self {
         let bts = ancount.to_be_bytes();
         (self.0[6], self.0[7]) = (bts[0], bts[1]);
         return self;
@@ -270,12 +270,12 @@ impl Header {
     // Authority Record Count (NSCOUNT): 16 bits
     // Number of records in the Authority section.
     // Expected value: 0.
-    pub fn ns_count(&self) -> u16 {
+    pub fn nscount(&self) -> u16 {
         let ns = [self.0[8], self.0[9]];
         return u16::from_be_bytes(ns);
     }
 
-    pub fn ns_count_with(&mut self, nscount: u16) -> &mut Self {
+    pub fn with_nscount(&mut self, nscount: u16) -> &mut Self {
         let bts = nscount.to_be_bytes();
         (self.0[8], self.0[9]) = (bts[0], bts[1]);
         return self;
@@ -284,12 +284,12 @@ impl Header {
     // Additional Record Count (ARCOUNT): 16 bits
     // Number of records in the Additional section.
     // Expected value: 0.
-    pub fn ar_count(&self) -> u16 {
+    pub fn arcount(&self) -> u16 {
         let ar = [self.0[10], self.0[11]];
         return u16::from_be_bytes(ar);
     }
 
-    pub fn ar_count_with(&mut self, arcount: u16) -> &mut Self {
+    pub fn with_arcount(&mut self, arcount: u16) -> &mut Self {
         let bts = arcount.to_be_bytes();
         (self.0[10], self.0[11]) = (bts[0], bts[1]);
         return self;
@@ -311,9 +311,9 @@ mod tests {
     }
 
     #[test]
-    pub fn test_header_id_with() {
+    pub fn test_header_with_id() {
         let mut head = Header([0; 12]);
-        head.id_with(12);
+        head.with_id(12);
         assert_eq!(12, head.id());
     }
 
@@ -326,35 +326,35 @@ mod tests {
     }
 
     #[test]
-    pub fn test_header_qr_with() {
+    pub fn test_header_with_qr() {
         let mut head = Header([0; 12]);
-        head.qr_with(12);
+        head.with_qr(12);
         assert_eq!(0, head.qr());
-        head.qr_with(1);
+        head.with_qr(1);
         assert_eq!(1, head.qr());
-        head.qr_with(0);
+        head.with_qr(0);
         assert_eq!(0, head.qr());
     }
 
     #[test]
-    pub fn test_header_op_code() {
+    pub fn test_header_opcode() {
         let mut head = Header([0, 0, u8::MAX, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        assert_eq!(15, head.op_code());
+        assert_eq!(15, head.opcode());
         head = Header([0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        assert_eq!(15, head.op_code());
+        assert_eq!(15, head.opcode());
         head = Header([0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        assert_eq!(1, head.op_code());
+        assert_eq!(1, head.opcode());
     }
 
     #[test]
-    pub fn test_header_op_code_with() {
+    pub fn test_header_with_opcode() {
         let mut head = Header([0; 12]);
-        head.op_code_with(12);
-        assert_eq!(12, head.op_code());
-        head.op_code_with(99);
-        assert_eq!(12, head.op_code());
-        head.op_code_with(15);
-        assert_eq!(15, head.op_code());
+        head.with_opcode(12);
+        assert_eq!(12, head.opcode());
+        head.with_opcode(99);
+        assert_eq!(12, head.opcode());
+        head.with_opcode(15);
+        assert_eq!(15, head.opcode());
     }
 
     #[test]
@@ -366,13 +366,13 @@ mod tests {
     }
 
     #[test]
-    pub fn test_header_aa_with() {
+    pub fn test_header_with_aa() {
         let mut head = Header([0; 12]);
-        head.aa_with(1);
+        head.with_aa(1);
         assert_eq!(1, head.aa());
-        head.aa_with(2);
+        head.with_aa(2);
         assert_eq!(1, head.aa());
-        head.aa_with(0);
+        head.with_aa(0);
         assert_eq!(0, head.aa());
     }
 
@@ -387,13 +387,13 @@ mod tests {
     }
 
     #[test]
-    pub fn test_header_tc_with() {
+    pub fn test_header_with_tc() {
         let mut head = Header([0; 12]);
-        head.tc_with(1);
+        head.with_tc(1);
         assert_eq!(1, head.tc());
-        head.tc_with(2);
+        head.with_tc(2);
         assert_eq!(1, head.tc());
-        head.tc_with(0);
+        head.with_tc(0);
         assert_eq!(0, head.tc());
     }
 
@@ -408,13 +408,13 @@ mod tests {
     }
 
     #[test]
-    pub fn test_header_rd_with() {
+    pub fn test_header_with_rd() {
         let mut head = Header([0; 12]);
-        head.rd_with(1);
+        head.with_rd(1);
         assert_eq!(1, head.rd());
-        head.rd_with(2);
+        head.with_rd(2);
         assert_eq!(1, head.rd());
-        head.rd_with(0);
+        head.with_rd(0);
         assert_eq!(0, head.rd());
     }
 
@@ -429,13 +429,13 @@ mod tests {
     }
 
     #[test]
-    pub fn test_header_ra_with() {
+    pub fn test_header_with_ra() {
         let mut head = Header([0; 12]);
-        head.ra_with(1);
+        head.with_ra(1);
         assert_eq!(1, head.ra());
-        head.ra_with(2);
+        head.with_ra(2);
         assert_eq!(1, head.ra());
-        head.ra_with(0);
+        head.with_ra(0);
         assert_eq!(0, head.ra());
     }
 
@@ -446,95 +446,95 @@ mod tests {
     }
 
     #[test]
-    pub fn test_header_z_with() {
+    pub fn test_header_with_z() {
         let mut head = Header([0; 12]);
-        head.z_with(1);
+        head.with_z(1);
         assert_eq!(1, head.z());
-        head.z_with(7);
+        head.with_z(7);
         assert_eq!(7, head.z());
-        head.z_with(8);
+        head.with_z(8);
         assert_eq!(7, head.z());
     }
 
     #[test]
-    pub fn test_header_r_code() {
+    pub fn test_header_rcode() {
         let mut head = Header([0, 0, 0, 240, 0, 0, 0, 0, 0, 0, 0, 0]);
-        assert_eq!(15, head.r_code());
+        assert_eq!(15, head.rcode());
     }
 
     #[test]
-    pub fn test_header_r_code_with() {
+    pub fn test_header_with_rcode() {
         let mut head = Header([0; 12]);
-        head.r_code_with(1);
-        assert_eq!(1, head.r_code());
-        head.r_code_with(7);
-        assert_eq!(7, head.r_code());
-        head.r_code_with(15);
-        assert_eq!(15, head.r_code());
-        head.r_code_with(16);
-        assert_eq!(15, head.r_code());
+        head.with_rcode(1);
+        assert_eq!(1, head.rcode());
+        head.with_rcode(7);
+        assert_eq!(7, head.rcode());
+        head.with_rcode(15);
+        assert_eq!(15, head.rcode());
+        head.with_rcode(16);
+        assert_eq!(15, head.rcode());
     }
 
     #[test]
-    pub fn test_header_qd_count() {
+    pub fn test_header_qdcount() {
         let mut head = Header([0, 0, 0, 14, 2, 4, 0, 0, 0, 0, 0, 0]);
-        assert_eq!(516, head.qd_count());
+        assert_eq!(516, head.qdcount());
     }
 
     #[test]
-    pub fn test_header_qd_count_with() {
+    pub fn test_header_with_qdcount() {
         let mut head = Header([0; 12]);
-        head.qd_count_with(16);
-        assert_eq!(16, head.qd_count());
-        head.qd_count_with(516);
+        head.with_qdcount(16);
+        assert_eq!(16, head.qdcount());
+        head.with_qdcount(516);
         assert_eq!(2, head.0[4]);
         assert_eq!(4, head.0[5]);
     }
 
     #[test]
-    pub fn test_header_an_count() {
+    pub fn test_header_ancount() {
         let mut head = Header([0, 0, 0, 14, 0, 0, 2, 4, 0, 0, 0, 0]);
-        assert_eq!(516, head.an_count());
+        assert_eq!(516, head.ancount());
     }
 
     #[test]
-    pub fn test_header_an_count_with() {
+    pub fn test_header_with_ancount() {
         let mut head = Header([0; 12]);
-        head.an_count_with(16);
-        assert_eq!(16, head.an_count());
-        head.an_count_with(516);
+        head.with_ancount(16);
+        assert_eq!(16, head.ancount());
+        head.with_ancount(516);
         assert_eq!(2, head.0[6]);
         assert_eq!(4, head.0[7]);
     }
 
     #[test]
-    pub fn test_header_ns_count() {
+    pub fn test_header_nscount() {
         let mut head = Header([0, 0, 0, 14, 0, 0, 0, 0, 2, 4, 0, 0]);
-        assert_eq!(516, head.ns_count());
+        assert_eq!(516, head.nscount());
     }
 
     #[test]
-    pub fn test_header_ns_count_with() {
+    pub fn test_header_with_nscount() {
         let mut head = Header([0; 12]);
-        head.ns_count_with(16);
-        assert_eq!(16, head.ns_count());
-        head.ns_count_with(516);
+        head.with_nscount(16);
+        assert_eq!(16, head.nscount());
+        head.with_nscount(516);
         assert_eq!(2, head.0[8]);
         assert_eq!(4, head.0[9]);
     }
 
     #[test]
-    pub fn test_header_ar_count() {
+    pub fn test_header_arcount() {
         let mut head = Header([0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 2, 4]);
-        assert_eq!(516, head.ar_count());
+        assert_eq!(516, head.arcount());
     }
 
     #[test]
-    pub fn test_header_ar_count_with() {
+    pub fn test_header_with_arcount() {
         let mut head = Header([0; 12]);
-        head.ar_count_with(16);
-        assert_eq!(16, head.ar_count());
-        head.ar_count_with(516);
+        head.with_arcount(16);
+        assert_eq!(16, head.arcount());
+        head.with_arcount(516);
         assert_eq!(2, head.0[10]);
         assert_eq!(4, head.0[11]);
     }
