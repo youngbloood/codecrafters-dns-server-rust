@@ -21,7 +21,7 @@ impl DNS {
         return &self.head;
     }
 
-    pub fn encode(&mut self) -> Vec<u8> {
+    pub fn encode(&self) -> Vec<u8> {
         let mut result = Vec::<u8>::new();
 
         result.extend_from_slice(&self.head.get_0());
