@@ -1,6 +1,5 @@
-use std::io;
+use super::{answer::Answers, header::Header, question::Question};
 
-use super::{answer::Answers, Header, Question};
 pub struct DNS {
     raw: Vec<u8>,
     head: Header,
